@@ -9,6 +9,10 @@ public class Sensor {
     private String sensorName;
     Supplier<Double> sunnyFunc, rainyFunc, snowFunc;
 
+    public String getSensorName() {
+        return sensorName;
+    }
+
     public Sensor(String sensorName, Supplier<Double> sunnyFunc, Supplier<Double> rainyFunc, Supplier<Double> snowFunc) {
         this.sensorName = sensorName;
         this.sunnyFunc = sunnyFunc;

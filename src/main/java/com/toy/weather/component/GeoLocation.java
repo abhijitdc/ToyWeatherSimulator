@@ -31,21 +31,35 @@ public class GeoLocation {
     public MarkovProbVector getMarkovProbVector() {
         int zNo = 0, eNo = 0;
 
-        if (Math.abs(longi) / 30 > 2)
+        if (Math.abs(longi) / 30 >= 2)
             zNo = 3;
         else if (Math.abs(longi) / 30 > 1)
             zNo = 2;
-        else if (Math.abs(longi) / 30 < 1)
+        else if (Math.abs(longi) / 30 <= 1)
             zNo = 1;
 
-        if (Math.abs(longi) / 77 > 2)
+        if (Math.abs(elv) / 77 >= 2)
             eNo = 3;
-        else if (Math.abs(longi) / 77 > 1)
+        else if (Math.abs(elv) / 77 > 1)
             eNo = 2;
-        else if (Math.abs(longi) / 77 < 1)
+        else if (Math.abs(elv) / 77 <= 1)
             eNo = 1;
 
         return MarkovProbVector.LOOKUP.get(zNo, eNo);
 
+    }
+
+    public static void main(String args[]){
+        MarkovProbVector mVector = new GeoLocation(30. ,-98.2 ,18).getMarkovProbVector();
+        System.out.println(mVector);
+    }
+
+    @Override
+    public String toString() {
+        return "GeoLocation{" +
+                "longi=" + longi +
+                ", lati=" + lati +
+                ", elv=" + elv +
+                '}';
     }
 }

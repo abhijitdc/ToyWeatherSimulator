@@ -10,7 +10,7 @@ public class App {
 
         TrainingDataGenerator tdGen = null;
         try {
-            tdGen = new TrainingDataGenerator(LocalDateTime.of(2018, 1, 1, 0, 0, 0), 1, 30);
+            tdGen = new TrainingDataGenerator(LocalDateTime.of(2018, 1, 1, 0, 0, 0), 10000, 365);
             tdGen.generateTraingData();
         } catch (Exception e) {
             e.printStackTrace();

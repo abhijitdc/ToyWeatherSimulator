@@ -30,8 +30,8 @@ public class LocationSampleGenerator {
             int rgb = img.getRGB(x, y);
             red = (rgb >> 16) & 0x000000FF;
 
-            System.out.println(String.format("%d %d %d", x, y, red));
-            System.out.println(String.format("%.2f %.2f %d", longitudeConverter(y), latitudeConverter(x), red));
+//            System.out.println(String.format("%d %d %d", x, y, red));
+//            System.out.println(String.format("%.2f %.2f %d", longitudeConverter(y), latitudeConverter(x), red));
 
             sampleLocations.add(new GeoLocation(longitudeConverter(y), latitudeConverter(x), red));
         }

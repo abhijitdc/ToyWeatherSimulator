@@ -10,8 +10,7 @@ public enum WeatherCondition {
 
     SUNNY("SUNNY", 0),
     RAIN("RAIN", 1),
-    SNOW("SNOW", 2),
-    UNKNOWN("UNKNOWN", 99);
+    SNOW("SNOW", 2);
 
     private String condName;
     private int index;

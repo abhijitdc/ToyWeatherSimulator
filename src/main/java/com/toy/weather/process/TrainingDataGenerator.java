@@ -8,9 +8,7 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 
 import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by abhijitdc on 1/4/19.
@@ -49,26 +47,50 @@ public class TrainingDataGenerator {
 
     public void generateTraingData() throws Exception {
 
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("src/main/resources/condition.txt"))))) {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("src/main/resources/training.dat"))))) {
             for (GeoLocation gcl : sampleLocations) {
+                System.out.println(gcl);
                 //select a random starting weather condition for the geo location
                 WeatherCondition wCond = WeatherCondition.LOOKUP.get(new Random().nextInt(3));
+                Map<Integer, WeatherCondition> wCondObservations = new HashMap<>();
+                LocalDateTime sampleDate = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), startDate.getHour(), startDate.getMinute(), startDate.getSecond());
+
                 for (int i = 0; i < noOfDays; i++) {
                     wCond = gcl.getMarkovProbVector().getNextWeatherCond(wCond);
-                    System.out.println("Date " + startDate + " COND " + wCond);
-                    String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), startDate.getDayOfYear());
-                    bw.write(dataSample);
-                    bw.newLine();
-                    startDate = startDate.plusDays(1);
+                    {
+                        String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), "COND");
+                        bw.write(dataSample);
+                        bw.newLine();
+                    }
+                    {
+                        Double temperature = tempSensor.getSensorData(wCond);
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", temperature, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), tempSensor.getSensorName());
+                        bw.write(dataSample);
+                        bw.newLine();
+                    }
+                    {
+                        Double humidity = humiditySensor.getSensorData(wCond);
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", humidity, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), humiditySensor.getSensorName());
+                        bw.write(dataSample);
+                        bw.newLine();
+                    }
+                    {
+                        Double pressure = pressureSensor.getSensorData(wCond);
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", pressure, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), pressureSensor.getSensorName());
+                        bw.write(dataSample);
+                        bw.newLine();
+                    }
+
+
+                    sampleDate = sampleDate.plusDays(1);
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception("Failed to generate training data");
         }
 
     }
 
-    public void generateTemperatureData(WeatherCondition wCond) throws Exception {
 
-    }
 }
