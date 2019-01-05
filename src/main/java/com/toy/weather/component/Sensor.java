@@ -7,17 +7,20 @@ import java.util.function.Supplier;
  */
 public class Sensor {
     private String sensorName;
-    Supplier<Double> sunnyFunc, rainyFunc, snowFunc;
+    private Supplier<Double> sunnyFunc, rainyFunc, snowFunc;
+    private SensorType sensorType;
+
 
     public String getSensorName() {
         return sensorName;
     }
 
-    public Sensor(String sensorName, Supplier<Double> sunnyFunc, Supplier<Double> rainyFunc, Supplier<Double> snowFunc) {
+    public Sensor(String sensorName, Supplier<Double> sunnyFunc, Supplier<Double> rainyFunc, Supplier<Double> snowFunc, SensorType sensorType) {
         this.sensorName = sensorName;
         this.sunnyFunc = sunnyFunc;
         this.rainyFunc = rainyFunc;
         this.snowFunc = snowFunc;
+        this.sensorType = sensorType;
     }
 
     public Double getSensorData(WeatherCondition cond) throws Exception {
