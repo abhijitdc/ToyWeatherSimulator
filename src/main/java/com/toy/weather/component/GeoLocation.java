@@ -16,6 +16,18 @@ public class GeoLocation {
     private double longi, lati;
     private int elv;
 
+    public double getLongi() {
+        return longi;
+    }
+
+    public double getLati() {
+        return lati;
+    }
+
+    public int getElv() {
+        return elv;
+    }
+
     public MarkovProbVector getMarkovProbVector() {
         int zNo = 0, eNo = 0;
 

@@ -2,11 +2,15 @@ package com.toy.weather.process;
 
 import com.toy.weather.component.GeoLocation;
 import com.toy.weather.component.Sensor;
+import com.toy.weather.component.WeatherCondition;
+import com.toy.weather.util.LocationSampleGenerator;
 import org.apache.commons.math3.distribution.NormalDistribution;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by abhijitdc on 1/4/19.
@@ -14,14 +18,18 @@ import java.util.List;
 public class TrainingDataGenerator {
 
     private LocalDateTime startDate;
-    private int noOfGeoLocations;
     private int noOfDays;
     private NormalDistribution nd = new NormalDistribution();
+    private List<GeoLocation> sampleLocations;
 
-    public TrainingDataGenerator(LocalDateTime startDate, int noOfGeoLocations, int noOfDays) {
+    public TrainingDataGenerator(LocalDateTime startDate, int noOfGeoLocations, int noOfDays) throws InstantiationException {
         this.startDate = startDate;
-        this.noOfGeoLocations = noOfGeoLocations;
         this.noOfDays = noOfDays;
+        try {
+            this.sampleLocations = new LocationSampleGenerator().samples(noOfGeoLocations);
+        } catch (IOException e) {
+            throw new InstantiationException("Failed to get GeoLocation samples");
+        }
     }
 
     private Sensor tempSensor = new Sensor("TEMPERATURE",
@@ -39,11 +47,28 @@ public class TrainingDataGenerator {
             () -> 900.0 + 1.5 * nd.sample(),
             () -> 800.0 + 2.0 * nd.sample());
 
-    List<GeoLocation> lcList = Arrays.asList(
-            new GeoLocation(-86.67, 151.21, 39),
-            new GeoLocation(16.67, 11.21, 189));
+    public void generateTraingData() throws Exception {
 
-    public void generateWeatherConditionData() {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("src/main/resources/condition.txt"))))) {
+            for (GeoLocation gcl : sampleLocations) {
+                //select a random starting weather condition for the geo location
+                WeatherCondition wCond = WeatherCondition.LOOKUP.get(new Random().nextInt(3));
+                for (int i = 0; i < noOfDays; i++) {
+                    wCond = gcl.getMarkovProbVector().getNextWeatherCond(wCond);
+                    System.out.println("Date " + startDate + " COND " + wCond);
+                    String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), startDate.getDayOfYear());
+                    bw.write(dataSample);
+                    bw.newLine();
+                    startDate = startDate.plusDays(1);
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception("Failed to generate training data");
+        }
+
+    }
+
+    public void generateTemperatureData(WeatherCondition wCond) throws Exception {
 
     }
 }

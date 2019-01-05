@@ -6,6 +6,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -20,8 +21,8 @@ public class LocationSampleGenerator {
         BufferedImage img = ImageIO.read(new File("src/main/resources/elevation_DE.BMP"));
 
         int red;
-        int green;
-        int blue;
+        List<GeoLocation> sampleLocations = new ArrayList<>();
+
         Random rd = new Random();
         for (int i = 0; i < sampleNo; i++) {
             int x = rd.nextInt(width);
@@ -31,9 +32,11 @@ public class LocationSampleGenerator {
 
             System.out.println(String.format("%d %d %d", x, y, red));
             System.out.println(String.format("%.2f %.2f %d", longitudeConverter(y), latitudeConverter(x), red));
+
+            sampleLocations.add(new GeoLocation(longitudeConverter(y), latitudeConverter(x), red));
         }
 
-        return null;
+        return sampleLocations;
     }
 
     public void printPixel(int x, int y) throws IOException {
@@ -76,7 +79,8 @@ public class LocationSampleGenerator {
 
     public static void main(String args[]) throws IOException {
         LocationSampleGenerator lSampler = new LocationSampleGenerator();
-        lSampler.printPixel(770, 218);
+        lSampler.samples(200);
+//        lSampler.printPixel(770, 218);
     }
 
 }
