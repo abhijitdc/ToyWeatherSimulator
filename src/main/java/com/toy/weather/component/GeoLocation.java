@@ -4,6 +4,15 @@ import com.toy.weather.driver.MarkovProbVector;
 
 /**
  * Created by abhijitdc on 1/4/19.
+ *
+ * This class encapsulates a Geo location.It has helper methods to convert the location to
+ * a specific zone and elevation category based on the longitude and elevation data. Both longitude and
+ * elevation has been divided into three zones. These zones are used to select a probability vector for
+ * Markov chain.
+ * Any geo location would belong to either of these zones
+ * Z1E1,Z1E2,Z1E3
+ * Z2E1,Z2E2,Z2E3
+ * Z3E1,Z3E2,Z3E3
  */
 public class GeoLocation {
 
@@ -28,6 +37,10 @@ public class GeoLocation {
         return elv;
     }
 
+    /**
+     * Gives this location's probability Vector for weather condition transition.
+     * @return MarkovProbVector
+     */
     public MarkovProbVector getMarkovProbVector() {
         int zNo = 0, eNo = 0;
 
@@ -49,10 +62,6 @@ public class GeoLocation {
 
     }
 
-    public static void main(String args[]){
-        MarkovProbVector mVector = new GeoLocation(30. ,-98.2 ,18).getMarkovProbVector();
-        System.out.println(mVector);
-    }
 
     @Override
     public String toString() {

@@ -6,6 +6,11 @@ import com.toy.weather.component.WeatherCondition;
 
 /**
  * Created by abhijitdc on 1/4/19.
+ *
+ * Collection of probability vectors for use in Markov chain transition. Based on the zone of
+ * the GeoLocation one of the probability vector will be chosen to generate simulated weather condition.
+ * Each enum entry holds a 3X3 vector in one dimensional array.
+ *
  */
 public enum MarkovProbVector {
 
@@ -23,18 +28,6 @@ public enum MarkovProbVector {
     int elevRange;
     Double[] condProb;
 
-    public int getZoneNo() {
-        return zoneNo;
-    }
-
-    public int getElevRange() {
-        return elevRange;
-    }
-
-    public Double[] getCondProb() {
-        return condProb;
-    }
-
 
     MarkovProbVector(int zoneNo, int elevRange, Double... condProb) {
         this.zoneNo = zoneNo;
@@ -42,6 +35,7 @@ public enum MarkovProbVector {
         this.condProb = condProb;
     }
 
+    //data structure to lookup a probability vector based on longitude zone and elevation
     public static final Table<Integer, Integer, MarkovProbVector> LOOKUP
             = HashBasedTable.create();
 
@@ -51,6 +45,11 @@ public enum MarkovProbVector {
         }
     }
 
+    /**
+     * Markov chain transition function to determine the next likely weather condition based on the current.
+     * @param currentWeatherCond
+     * @return WeatherCondition
+     */
     public WeatherCondition getNextWeatherCond(WeatherCondition currentWeatherCond) {
         int N = 3;
         double rand = Math.random();

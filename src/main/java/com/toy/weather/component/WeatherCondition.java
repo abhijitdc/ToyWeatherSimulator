@@ -5,6 +5,8 @@ import java.util.Map;
 
 /**
  * Created by abhijitdc on 1/4/19.
+ *
+ * Enumeration for three applicable weather conditions.
  */
 public enum WeatherCondition {
 
@@ -24,6 +26,7 @@ public enum WeatherCondition {
     }
 
 
+    //utility data structure to lookup enum by index, since libsvm deals with numeric values
     public static final Map<Integer, WeatherCondition> LOOKUP = new HashMap<>();
 
     static {

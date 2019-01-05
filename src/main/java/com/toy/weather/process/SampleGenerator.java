@@ -1,7 +1,6 @@
 package com.toy.weather.process;
 
 import com.toy.weather.component.GeoLocation;
-import com.toy.weather.component.Sensor;
 import com.toy.weather.component.SensorType;
 import com.toy.weather.component.WeatherCondition;
 import com.toy.weather.models.WeatherCondClassifierTrainer;
@@ -13,7 +12,6 @@ import org.apache.spark.mllib.tree.model.RandomForestModel;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
