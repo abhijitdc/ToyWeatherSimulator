@@ -8,9 +8,9 @@ import java.util.Map;
  */
 public enum WeatherCondition {
 
-    SUNNY("SUNNY", 0),
-    RAIN("RAIN", 1),
-    SNOW("SNOW", 2);
+    SUNNY("Sunny", 0),
+    RAIN("Rain", 1),
+    SNOW("Snow", 2);
 
     private String condName;
     private int index;

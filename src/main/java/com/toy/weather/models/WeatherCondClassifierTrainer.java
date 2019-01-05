@@ -3,7 +3,6 @@ package com.toy.weather.models;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.toy.weather.component.SensorType;
 import com.toy.weather.component.WeatherCondition;
 import org.apache.spark.mllib.linalg.Vectors;
 import scala.Tuple2;
@@ -22,11 +21,18 @@ import org.apache.spark.mllib.util.MLUtils;
  */
 public class WeatherCondClassifierTrainer {
 
-    public void trainModel(String modelName) {
+    private long RUNID;
+    public static final String modelName = "weatherConditionClassifierModel";
+
+    public WeatherCondClassifierTrainer(long RUNID) {
+        this.RUNID = RUNID;
+    }
+
+    public void trainModel() {
         SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("WeatherCondClassifierTrainer");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
         // Load and parse the data file.
-        String datapath = "src/main/resources/training.dat";
+        String datapath = "target/tmp/" + RUNID + "/training.dat";
 
         JavaRDD<LabeledPoint> allData = MLUtils.loadLibSVMFile(jsc.sc(), datapath).toJavaRDD();
         JavaRDD<LabeledPoint> data = allData.filter(l -> l.features().toArray()[4] == 0.0);
@@ -61,9 +67,9 @@ public class WeatherCondClassifierTrainer {
         System.out.println("Learned classification forest model:\n" + model.toDebugString());
 
         // Save and load model
-        model.save(jsc.sc(), "target/tmp/" + modelName);
+        model.save(jsc.sc(), "target/tmp/" + RUNID + "/" + modelName);
         RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
-                "target/tmp/" + modelName);
+                "target/tmp/" + RUNID + "/" + modelName);
         double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, 0.0));
         System.out.println("<<<<<<<<<<<<<<<<<<<<< WeatherCond Predic >>>>>>>>>>>>>>>>>>>>>>>>>>>> " + val);
 

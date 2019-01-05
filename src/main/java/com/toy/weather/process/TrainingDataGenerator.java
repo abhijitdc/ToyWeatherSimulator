@@ -22,11 +22,13 @@ public class TrainingDataGenerator {
     private List<GeoLocation> sampleLocations;
     private int noOfGeoLocations;
     private Map<SensorType, Sensor> sensorCollection;
+    private long RUNID;
 
-    public TrainingDataGenerator(LocalDateTime startDate, int noOfGeoLocations, int noOfDays) throws InstantiationException {
+    public TrainingDataGenerator(LocalDateTime startDate, int noOfGeoLocations, int noOfDays, long RUNID) throws InstantiationException {
         this.startDate = startDate;
         this.noOfDays = noOfDays;
         this.noOfGeoLocations = noOfGeoLocations;
+        this.RUNID = RUNID;
         init();
     }
 
@@ -62,7 +64,11 @@ public class TrainingDataGenerator {
 
     public void generateTraingData() throws Exception {
 
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("src/main/resources/training.dat"))))) {
+        String datapath = "target/tmp/" + RUNID + "/training.dat";
+        File fs = new File("target/tmp/" + RUNID);
+        if (!fs.exists()) fs.mkdirs();
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(datapath, false))) {
             for (GeoLocation gcl : sampleLocations) {
                 //select a random starting weather condition for the geo location
                 WeatherCondition wCond = WeatherCondition.LOOKUP.get(new Random().nextInt(3));
@@ -78,8 +84,7 @@ public class TrainingDataGenerator {
                         bw.newLine();
                     }
 
-                    for(SensorType st: SensorType.values())
-                    {
+                    for (SensorType st : SensorType.values()) {
                         Sensor sensor = sensorCollection.get(st);
                         Double temperature = sensor.getSensorData(wCond);
                         String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", temperature, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), st.getSensorId());

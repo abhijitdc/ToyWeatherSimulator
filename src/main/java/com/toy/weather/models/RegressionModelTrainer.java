@@ -19,12 +19,17 @@ import java.util.Map;
  * Created by abhijitdc on 1/5/19.
  */
 public class RegressionModelTrainer {
+    private long RUNID;
+
+    public RegressionModelTrainer(long RUNID) {
+        this.RUNID = RUNID;
+    }
 
     public void trainModel(String modelName, SensorType sensorType) {
         SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("ToyWeatherRegressionModelTrainer");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
         // Load and parse the data file.
-        String datapath = "src/main/resources/training.dat";
+        String datapath = "target/tmp/" + RUNID + "/training.dat";
 
 
         JavaRDD<LabeledPoint> allData = MLUtils.loadLibSVMFile(jsc.sc(), datapath).toJavaRDD();
@@ -60,9 +65,11 @@ public class RegressionModelTrainer {
         System.out.println("Learned regression forest model:\n" + model.toDebugString());
 
         // Save and load model
-        model.save(jsc.sc(), "target/tmp/" + modelName);
+        model.save(jsc.sc(), "target/tmp/" + RUNID
+                + "/" + modelName);
         RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
-                "target/tmp/" + modelName);
+                "target/tmp/"+ RUNID
+                        + "/"  + modelName);
         // $example off$
         double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, Double.valueOf(sensorType.getSensorId())));
         System.out.println(sensorType + " <<<<<<<<<<<<<<<<<<<<<<< Predic >>>>>>>>>>>>>>>>>>>>>>>>> " + val);
