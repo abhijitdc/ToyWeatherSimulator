@@ -1,0 +1,10 @@
+target
+bin
+.classpath
+.settings/
+.project
+.vertx
+.idea
+.DS_Store
+*.iml
+*.sql
