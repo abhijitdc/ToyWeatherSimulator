@@ -11,40 +11,30 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.tree.model.RandomForestModel;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 /**
  * Created by abhijitdc on 1/5/19.
  */
 public class SampleGenerator {
 
-    private List<GeoLocation> sampleLocations;
-    private LocalDateTime observationStartDate;
-    private int noOfLocations;
-    private int noOfSamplesPerLocation;
     private long RUNID;
 
-    public SampleGenerator(LocalDateTime observationStartDate, int noOfLocations, int noOfSamplesPerLocation, long RUNID) throws InstantiationException {
-        try {
-            this.observationStartDate = observationStartDate;
-            this.noOfLocations = noOfLocations;
-            this.noOfSamplesPerLocation = noOfSamplesPerLocation;
-            this.sampleLocations = new LocationSampleGenerator().samples(noOfLocations);
-            this.RUNID = RUNID;
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new InstantiationException();
-        }
+    public SampleGenerator(long RUNID) throws InstantiationException {
+
+        this.RUNID = RUNID;
     }
 
-    public void generateSamples() {
+    public void generateSampleForLocation(List<GeoLocation> sampleLocations, LocalDateTime observationStartDate, int noOfSamplesPerLocation) throws Exception {
         Random rd = new Random();
         Map<SensorType, RandomForestModel> sensorModels = new HashMap<>();
+
+
         SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("modelExecutor");
 
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
@@ -56,20 +46,42 @@ public class SampleGenerator {
                     "target/tmp/" + RUNID + "/" + st.getSensorName() + "RegressionModel");
             sensorModels.put(st, regressionModel);
         }
-
-        int locationNo = 0;
-        for (GeoLocation glc : sampleLocations) {
-            for (int i = 0; i < noOfSamplesPerLocation; i++) {
-                LocalDateTime sampleDate = observationStartDate.plusDays(rd.nextInt(5 * 365));
-                double weatheCondIndex = weatherCondModel.predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), 0.0));
-                double temperature = sensorModels.get(SensorType.TEMPSENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.TEMPSENSOR.getSensorId()));
-                double humidity = sensorModels.get(SensorType.HUMIDSENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.HUMIDSENSOR.getSensorId()));
-                double pressure = sensorModels.get(SensorType.PRESSURESENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.PRESSURESENSOR.getSensorId()));
+        String datapath = "target/tmp/" + RUNID + "/sampledata.dat";
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(datapath, false))) {
+            int locationNo = 0;
+            for (GeoLocation glc : sampleLocations) {
                 System.out.println("Location " + glc);
-                WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(weatheCondIndex));
-                System.out.println(String.format("COND %s TEMP %.2f HUMID %.2f PRESS %.2f Date %s", wc.getCondName(), temperature, humidity, pressure, sampleDate));
+                for (int i = 0; i < noOfSamplesPerLocation; i++) {
+                    LocalDateTime sampleDate = observationStartDate.plusDays(rd.nextInt(5 * 365));
+                    double weatheCondIndex = weatherCondModel.predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), 0.0));
+                    double temperature = sensorModels.get(SensorType.TEMPSENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.TEMPSENSOR.getSensorId()));
+                    double humidity = sensorModels.get(SensorType.HUMIDSENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.HUMIDSENSOR.getSensorId()));
+                    double pressure = sensorModels.get(SensorType.PRESSURESENSOR).predict(Vectors.dense(glc.getLongi(), glc.getLati(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.PRESSURESENSOR.getSensorId()));
+
+                    String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.US));
+                    WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(weatheCondIndex));
+                    String sampleData = String.format("%d|%.3f,%.3f,%d|%s|%s|%.2f|%.2f|%d", locationNo, glc.getLati(), glc.getLati(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, humidity, (int) Math.round(pressure));
+                    System.out.println(sampleData);
+                    bw.write(sampleData);
+                    bw.newLine();
+                }
+                locationNo++;
             }
-            locationNo++;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Failed to generate sample data");
+        } finally {
+            jsc.stop();
         }
+    }
+
+    public void generateSamples(LocalDateTime observationStartDate, int noOfLocations, int noOfSamplesPerLocation) throws Exception {
+        List<GeoLocation> sampleLocations = new LocationSampleGenerator().samples(noOfLocations);
+        generateSampleForLocation(sampleLocations, observationStartDate, noOfSamplesPerLocation);
+    }
+
+    public static void main(String rgs[]) throws Exception {
+        SampleGenerator sg = new SampleGenerator(1546727549623L);
+        sg.generateSamples(LocalDateTime.of(2016, 1, 1, 0, 0, 0), 10, 10);
     }
 }

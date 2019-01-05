@@ -26,7 +26,7 @@ public class App {
             WeatherCondClassifierTrainer classifierTrainer = new WeatherCondClassifierTrainer(RUNID);
             classifierTrainer.trainModel();
 
-            new SampleGenerator(LocalDateTime.of(2016, 1, 1, 0, 0, 0), 10, 10, RUNID).generateSamples();
+            new SampleGenerator(RUNID).generateSamples(LocalDateTime.of(2016, 1, 1, 0, 0, 0), 10, 10 );
 
         } catch (Exception e) {
             e.printStackTrace();
