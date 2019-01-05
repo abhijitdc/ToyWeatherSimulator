@@ -49,34 +49,33 @@ public class TrainingDataGenerator {
 
         try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File("src/main/resources/training.dat"))))) {
             for (GeoLocation gcl : sampleLocations) {
-                System.out.println(gcl);
+//                System.out.println(gcl);
                 //select a random starting weather condition for the geo location
                 WeatherCondition wCond = WeatherCondition.LOOKUP.get(new Random().nextInt(3));
-                Map<Integer, WeatherCondition> wCondObservations = new HashMap<>();
                 LocalDateTime sampleDate = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), startDate.getHour(), startDate.getMinute(), startDate.getSecond());
 
                 for (int i = 0; i < noOfDays; i++) {
                     wCond = gcl.getMarkovProbVector().getNextWeatherCond(wCond);
                     {
-                        String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), "COND");
+                        String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), 0);
                         bw.write(dataSample);
                         bw.newLine();
                     }
                     {
                         Double temperature = tempSensor.getSensorData(wCond);
-                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", temperature, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), tempSensor.getSensorName());
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", temperature, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), 1);
                         bw.write(dataSample);
                         bw.newLine();
                     }
                     {
                         Double humidity = humiditySensor.getSensorData(wCond);
-                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", humidity, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), humiditySensor.getSensorName());
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", humidity, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), 2);
                         bw.write(dataSample);
                         bw.newLine();
                     }
                     {
                         Double pressure = pressureSensor.getSensorData(wCond);
-                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", pressure, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), pressureSensor.getSensorName());
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", pressure, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), 3);
                         bw.write(dataSample);
                         bw.newLine();
                     }
