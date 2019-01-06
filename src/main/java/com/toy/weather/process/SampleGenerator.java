@@ -70,7 +70,7 @@ public class SampleGenerator {
 
                     String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
                     WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(weatheCondIndex));
-                    String sampleData = String.format("%s|%.3f,%.3f,%d|%s|%s|%.2f|%.2f|%d", "LOCATION-" + locationNo, glc.getLati(), glc.getLongi(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, pressure, (int) Math.round(humidity));
+                    String sampleData = String.format("%s|%.2f,%.2f,%d|%s|%s|%.1f|%.1f|%d", "LOCATION-" + locationNo, glc.getLati(), glc.getLongi(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, pressure, (int) Math.round(humidity));
 //                    System.out.println(sampleData);
                     bw.write(sampleData);
                     bw.newLine();

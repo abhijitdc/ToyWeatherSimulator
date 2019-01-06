@@ -71,7 +71,7 @@ Independent variable ~ Dependent variables
 >- Pressure ~  Latitude + Longitude + Elevation + Day of the year
 >- Weather Condition ~ Latitude + Longitude + Elevation + Day of the year
 
-## Execution
+## How to run it
 
 #### Build
 Maven is the build tool used for this repo. It will build a fat-jar with all dependencies bundled inside, so it can be executed without any classpath setup for dependencies.
@@ -83,11 +83,25 @@ Running mvn clean install will produce a fat jar target/app.jar
 >Note: Running jUnit test during the build is disabled by default, please change pom.xml skipTests to false
 
 #### Execute
+
+This simulator has two run mode.
+
+##### Run Mode 1 - With Predictive Model
+- Generate training data using Markov Process (in LIBSVM format) and then utilize that data to train predictive models to predict weather data for other geo locations.
+
 From the checkout directory run following command
-`java -cp target/app.jar com.tor.weather.App <optional: path of input json>`
+`java -cp target/app.jar com.toy.weather.App <optional: path of input json>`
 
 >- Note: Spark master is hardcoded as local so the jar will only execute locally and not get submitted to yarn.
 Todo: allow option to run local vs. cluster
+
+##### Run Mode 2 - No Predictive Model
+
+- In the second mode, it will just use the Markov Process and produce the weather data for random set of locations in desired format.
+
+From the checkout directory run following command
+`java -cp target/app.jar com.toy.weather.Simulator <optional: path of input json>`
+
 #### Input
 The launch programs accepts a json file as an input. If no input is provided it will use a bundled input file from src/main/resources/input.json.
 
@@ -102,9 +116,9 @@ Input json Format
   "reportingStartDate":"2016-03-02 11:22:10"
 }
 ```
->- trainingLocationNum - Number of Geo Location which will be chosen at random for training data generation.
->- trainingNumOfDays - Number of consecutive days for which the data will be generated. One data point for each sensor per location.
->- trainingStartDate - start date from which the training data will be generated.
+>- trainingLocationNum - Number of Geo Location which will be chosen at random for training data generation.(Not required for Run Mode 2)
+>- trainingNumOfDays - Number of consecutive days for which the data will be generated. One data point for each sensor per location.(Not required for Run Mode 2)
+>- trainingStartDate - start date from which the training data will be generated.(Not required for Run Mode 2)
 >- reportingLocationNum - Number of randomly chosen geo locations for which the model will predict weather data.
 >- reportingPerLocation - Number of weather data set to be predicted for each location.
 >- reportingStartDate - Start date from which the prediction needs to start.
@@ -117,7 +131,8 @@ Each run of the program will generate a RUNID from current system time and that 
  - pressure *(RUNID/PressureRegressionModel)*
  - humidity *(RUNID/HumidityRegressionModel)*
  - weather condition *(RUNID/weatherConditionClassifierModel)*
-- final output data *(RUNID/sampledata.dat)*
+- final output data for Run Mode 1 *(RUNID/sampledata.dat)*
+- final output data for Run Mode 2 *(RUNID/simulator.dat)*
 
 ## Reference
 

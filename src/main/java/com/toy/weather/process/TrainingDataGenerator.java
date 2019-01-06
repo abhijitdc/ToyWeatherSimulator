@@ -6,9 +6,11 @@ import com.toy.weather.component.SensorType;
 import com.toy.weather.component.WeatherCondition;
 import com.toy.weather.util.LocationSampleGenerator;
 import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.distribution.UniformRealDistribution;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
@@ -28,6 +30,7 @@ public class TrainingDataGenerator {
     private LocalDateTime startDate;
     private int noOfDays;
     private NormalDistribution nd = new NormalDistribution();
+    private UniformRealDistribution ud = new UniformRealDistribution();
     private List<GeoLocation> sampleLocations;
     private int noOfGeoLocations;
     private Map<SensorType, Sensor> sensorCollection;
@@ -65,9 +68,9 @@ public class TrainingDataGenerator {
                     () -> -10.0 + 0.5 * nd.sample(), SensorType.TEMPSENSOR);
 
             Sensor humiditySensor = new Sensor("HUMIDITY",
-                    () -> (70.0 - 30.0) * nd.sample() + 30.0,
-                    () -> (95.0 - 70.0) * nd.sample() + 70.0,
-                    () -> (70.0 - 40.0) * nd.sample() + 40.0, SensorType.HUMIDSENSOR);
+                    () -> (70.0 - 30.0) * ud.sample() + 30.0,
+                    () -> (95.0 - 70.0) * ud.sample() + 70.0,
+                    () -> (70.0 - 40.0) * ud.sample() + 40.0, SensorType.HUMIDSENSOR);
 
             Sensor pressureSensor = new Sensor("PRESSURE",
                     () -> 700.0 + 0.2 * nd.sample(),
@@ -91,7 +94,7 @@ public class TrainingDataGenerator {
      * simulated continuous value for temperature, humidity and pressure for the location and the day the year.
      * <p>
      * Generate all the sensor data and weather condition for a given location for each day.
-     *
+     * Output file is in LIBSVM format
      * @throws Exception
      */
     public void generateTraingData() throws Exception {
@@ -132,6 +135,52 @@ public class TrainingDataGenerator {
             throw new Exception("Failed to generate training data");
         }
 
+    }
+
+    /**
+     * Generate simulation data just using Markov chain and probability distribution
+     *
+     * @throws Exception
+     */
+    public void generateSimulationData() throws Exception {
+        String datapath = "target/tmp/" + RUNID + "/simulation.dat";
+        File fs = new File("target/tmp/" + RUNID);
+        if (!fs.exists()) fs.mkdirs();
+
+        int locationNo = 0;
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(datapath, false))) {
+            for (GeoLocation gcl : sampleLocations) {
+                //select a random starting weather condition for the geo location
+                WeatherCondition wCond = WeatherCondition.LOOKUP.get(new Random().nextInt(3));
+                LocalDateTime sampleDate = LocalDateTime.of(startDate.getYear(), startDate.getMonth(), startDate.getDayOfMonth(), startDate.getHour(), startDate.getMinute(), startDate.getSecond());
+
+                Map<SensorType, Double> sensorObservation = new HashMap<>();
+                for (int i = 0; i < noOfDays; i++) {
+
+                    wCond = gcl.getMarkovProbVector().getNextWeatherCond(wCond);
+                    for (SensorType st : SensorType.values()) {
+                        Sensor sensor = sensorCollection.get(st);
+                        Double observation = sensor.getSensorData(wCond);
+                        sensorObservation.put(st, observation);
+                    }
+                    String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+                    WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(wCond.getIndex()));
+                    String sampleData = String.format("%s|%.2f,%.2f,%d|%s|%s|%.1f|%.1f|%d", "LOCATION-" + locationNo, gcl.getLati(), gcl.getLongi(), gcl.getElv(), strSampleDate, wc.getCondName(),
+                            sensorObservation.get(SensorType.TEMPSENSOR),
+                            sensorObservation.get(SensorType.PRESSURESENSOR),
+                            (int) Math.round(sensorObservation.get(SensorType.HUMIDSENSOR)));
+
+                    bw.write(sampleData);
+                    bw.newLine();
+
+                    sampleDate = sampleDate.plusDays(1);
+                }
+                locationNo++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Failed to generate simulation data");
+        }
     }
 
 
