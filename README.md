@@ -22,12 +22,12 @@ Create a toy simulation of the environment (taking into account things like atmo
 
 ## Training Data Generation
 
-To generate the training data we are using a stochastic model (Markov Process) to first simulate weather condition change and then based on the weather condition we will generate other sensor measurements (temperature, pressure and humidity) from a plausible range.
+To generate the training data we are using a stochastic model ``(Markov Process)`` to first simulate weather condition change and then based on the weather condition we will generate other sensor measurements (temperature, pressure and humidity) from a plausible range.
 
-For state transition in Markov chain we will utilize multiple ``Transition Matrix`` by classifying a Geo location into zones based on latitude and elevation. The absolute latitude and elevation value will be divided into three ranges which will corresponds to nine probability vectors.
+For state transition in ``Markov chain`` we will utilize multiple ``Transition Matrix`` by classifying a Geo location into zones based on latitude and elevation. The absolute latitude and elevation value will be divided into three ranges which will corresponds to nine probability vectors.
 
-**Transition Matrix**
-Following are the nine set of vectors, out of which one will be chosen based on latitude and elevation.
+**Transition Matrix** -
+Following are the nine set of 3X3 *(sunny,rain,snow)* matrix, out of which one will be chosen based on latitude and elevation.
 
 |Vector|Latitude Zone|Elevation|
 |------|-------------|---------|
