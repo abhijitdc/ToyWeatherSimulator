@@ -17,6 +17,19 @@ import java.util.Map;
 
 /**
  * Created by abhijitdc on 1/5/19.
+ *
+ * Regression model to train separate model for temperature,humidity and pressure.
+ *
+ * Independent variable ~ Dependent variables
+ * ------------------------------------------------------------
+ * Weather Condition ~  Latitude + Longitude + Elevation + Day of the year
+ * Temperature ~  Latitude + Longitude + Elevation + Day of the year
+ * Humidity ~  Latitude + Longitude + Elevation + Day of the year
+ * Pressure ~  Latitude + Longitude + Elevation + Day of the year
+ *
+ *
+ * Generated model is stored under a specific directory with provided RUNID. This can help in organizing the model storage
+ * and future evaluation across different run to pick a better model.
  */
 public class RegressionModelTrainer {
     private long RUNID;
@@ -33,6 +46,7 @@ public class RegressionModelTrainer {
 
 
         JavaRDD<LabeledPoint> allData = MLUtils.loadLibSVMFile(jsc.sc(), datapath).toJavaRDD();
+        //filter data from the training file for a specific sensor
         JavaRDD<LabeledPoint> data = allData.filter(l -> l.features().toArray()[4] == Double.valueOf(sensorType.getSensorId()));
         data.take(10).forEach(l -> System.out.println(l.features().toArray()[3]));
 
@@ -70,7 +84,6 @@ public class RegressionModelTrainer {
         RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
                 "target/tmp/"+ RUNID
                         + "/"  + modelName);
-        // $example off$
         double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, Double.valueOf(sensorType.getSensorId())));
         System.out.println(sensorType + " <<<<<<<<<<<<<<<<<<<<<<< Predic >>>>>>>>>>>>>>>>>>>>>>>>> " + val);
         jsc.stop();

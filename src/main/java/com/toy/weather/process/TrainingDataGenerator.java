@@ -13,6 +13,15 @@ import java.util.*;
 
 /**
  * Created by abhijitdc on 1/4/19.
+ * <p>
+ * This class generates the simulated training data. First Markov chain is used to predict the next weather
+ * condition. Then utilizing that condition a set of predefined functions will produce a sensor data
+ * within a given range with a normal distribution.
+ * <p>
+ * Locations to generate the training data is chosen at random from elevation_DE.BMP file to utilize
+ * the real world topography.
+ * Generated training data will be stored * in target/tmp/" + RUNID + "/training.dat
+ * RUNID helps keep all training/predicted data and model organized in one directory.
  */
 public class TrainingDataGenerator {
 
@@ -24,6 +33,13 @@ public class TrainingDataGenerator {
     private Map<SensorType, Sensor> sensorCollection;
     private long RUNID;
 
+    /**
+     * @param startDate        - start date of the training data.
+     * @param noOfGeoLocations - number of locations for which training data will be generated.
+     * @param noOfDays         - number of individual days for which each location will give one set of sensor data.
+     * @param RUNID            - RUNID to keep te generated data organized into a single directory.
+     * @throws InstantiationException
+     */
     public TrainingDataGenerator(LocalDateTime startDate, int noOfGeoLocations, int noOfDays, long RUNID) throws InstantiationException {
         this.startDate = startDate;
         this.noOfDays = noOfDays;
@@ -32,6 +48,12 @@ public class TrainingDataGenerator {
         init();
     }
 
+    /**
+     * This method defines the sensor specific functions to select normally distributed
+     * value from a given range based on the weather condition.
+     *
+     * @throws InstantiationException
+     */
     private void init() throws InstantiationException {
         try {
             this.sampleLocations = new LocationSampleGenerator().samples(noOfGeoLocations);
@@ -62,6 +84,16 @@ public class TrainingDataGenerator {
     }
 
 
+    /**
+     * This method first selects the appropriate probability vector for Markov chain. Then starts with a
+     * random weather condition and then transition to select the next weather condition.
+     * For each selected weather condition appropriate function is executed to generate a
+     * simulated continuous value for temperature, humidity and pressure for the location and the day the year.
+     * <p>
+     * Generate all the sensor data and weather condition for a given location for each day.
+     *
+     * @throws Exception
+     */
     public void generateTraingData() throws Exception {
 
         String datapath = "target/tmp/" + RUNID + "/training.dat";
@@ -79,7 +111,7 @@ public class TrainingDataGenerator {
                     wCond = gcl.getMarkovProbVector().getNextWeatherCond(wCond);
 
                     {
-                        String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", wCond.getIndex(), gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), 0);
+                        String dataSample = String.format("%d 1:%.2f 2:%.2f 3:%d 4:%d 5:%s", wCond.getIndex(), gcl.getLati(), gcl.getLongi(), gcl.getElv(), sampleDate.getDayOfYear(), 0);
                         bw.write(dataSample);
                         bw.newLine();
                     }
@@ -87,7 +119,7 @@ public class TrainingDataGenerator {
                     for (SensorType st : SensorType.values()) {
                         Sensor sensor = sensorCollection.get(st);
                         Double temperature = sensor.getSensorData(wCond);
-                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", temperature, gcl.getLongi(), gcl.getLati(), gcl.getElv(), sampleDate.getDayOfYear(), st.getSensorId());
+                        String dataSample = String.format("%.2f 1:%.2f 2:%.2f 3:%d 4:%d 5:%d", temperature, gcl.getLati(), gcl.getLongi(), gcl.getElv(), sampleDate.getDayOfYear(), st.getSensorId());
                         bw.write(dataSample);
                         bw.newLine();
                     }

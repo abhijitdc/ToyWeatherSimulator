@@ -18,6 +18,9 @@ import org.apache.spark.mllib.util.MLUtils;
 
 /**
  * Created by abhijitdc on 1/5/19.
+ *
+ * Generated model is stored under a specific directory with provided RUNID. This can help in organizing the model storage
+ * and future evaluation across different run to pick a better model.
  */
 public class WeatherCondClassifierTrainer {
 
