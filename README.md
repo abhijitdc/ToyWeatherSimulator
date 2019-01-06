@@ -84,9 +84,9 @@ Running mvn clean install will produce a fat jar target/app.jar
 
 #### Execute
 From the checkout directory run following command
-`java -cp target/app.jar com.tor.weather.App <optional: path of input json>``
+`java -cp target/app.jar com.tor.weather.App <optional: path of input json>`
 
->- Note: the Spark master is hardcoded as local so the jar will only execute locally and not get submitted to yarn.
+>- Note: Spark master is hardcoded as local so the jar will only execute locally and not get submitted to yarn.
 Todo: allow option to run local vs. cluster
 #### Input
 The launch programs accepts a json file as an input. If no input is provided it will use a bundled input file from src/main/resources/input.json.
