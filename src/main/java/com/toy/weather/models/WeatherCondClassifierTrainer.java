@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.toy.weather.component.WeatherCondition;
-import org.apache.spark.mllib.linalg.Vectors;
 import scala.Tuple2;
 
 import org.apache.spark.SparkConf;
@@ -19,6 +18,7 @@ import org.apache.spark.mllib.util.MLUtils;
 /**
  * Created by abhijitdc on 1/5/19.
  *
+ * RandomForest classifier for Weather Condition ~  Latitude + Longitude + Elevation + Day of the year.
  * Generated model is stored under a specific directory with provided RUNID. This can help in organizing the model storage
  * and future evaluation across different run to pick a better model.
  */
@@ -31,7 +31,7 @@ public class WeatherCondClassifierTrainer {
         this.RUNID = RUNID;
     }
 
-    public void trainModel() {
+    public RandomForestModel trainModel() {
         SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("WeatherCondClassifierTrainer");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
         // Load and parse the data file.
@@ -39,7 +39,6 @@ public class WeatherCondClassifierTrainer {
 
         JavaRDD<LabeledPoint> allData = MLUtils.loadLibSVMFile(jsc.sc(), datapath).toJavaRDD();
         JavaRDD<LabeledPoint> data = allData.filter(l -> l.features().toArray()[4] == 0.0);
-        data.take(10).forEach(l -> System.out.println(l.features().toArray()[3]));
 
         // Split the data into training and test sets (30% held out for testing)
         JavaRDD<LabeledPoint>[] splits = data.randomSplit(new double[]{0.7, 0.3});
@@ -50,7 +49,7 @@ public class WeatherCondClassifierTrainer {
         // Empty categoricalFeaturesInfo indicates all features are continuous.
         int numClasses = WeatherCondition.values().length;
         Map<Integer, Integer> categoricalFeaturesInfo = new HashMap<>();
-        Integer numTrees = 3; // Use more in practice.
+        Integer numTrees = 10; // Use more in practice.
         String featureSubsetStrategy = "auto"; // Let the algorithm choose.
         String impurity = "gini";
         int maxDepth = 4;
@@ -71,12 +70,14 @@ public class WeatherCondClassifierTrainer {
 
         // Save and load model
         model.save(jsc.sc(), "target/tmp/" + RUNID + "/" + modelName);
-        RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
-                "target/tmp/" + RUNID + "/" + modelName);
-        double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, 0.0));
-        System.out.println("<<<<<<<<<<<<<<<<<<<<< WeatherCond Predic >>>>>>>>>>>>>>>>>>>>>>>>>>>> " + val);
+
+//        RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
+//                "target/tmp/" + RUNID + "/" + modelName);
+//        double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, 0.0));
+//        System.out.println("<<<<<<<<<<<<<<<<<<<<< WeatherCond Predic >>>>>>>>>>>>>>>>>>>>>>>>>>>> " + val);
 
         jsc.stop();
+        return model;
     }
 
 

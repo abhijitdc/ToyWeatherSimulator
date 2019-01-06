@@ -60,7 +60,6 @@ public class SampleGenerator {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(datapath, false))) {
             int locationNo = 0;
             for (GeoLocation glc : sampleLocations) {
-                System.out.println("Location " + glc);
                 for (int i = 0; i < noOfSamplesPerLocation; i++) {
                     LocalDateTime sampleDate = observationStartDate.plusDays(rd.nextInt(5 * 365));
 
@@ -72,7 +71,7 @@ public class SampleGenerator {
                     String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.US));
                     WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(weatheCondIndex));
                     String sampleData = String.format("%d|%.3f,%.3f,%d|%s|%s|%.2f|%.2f|%d", locationNo, glc.getLati(), glc.getLongi(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, humidity, (int) Math.round(pressure));
-                    System.out.println(sampleData);
+//                    System.out.println(sampleData);
                     bw.write(sampleData);
                     bw.newLine();
                 }

@@ -5,7 +5,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.mllib.linalg.Vectors;
 import org.apache.spark.mllib.regression.LabeledPoint;
 import org.apache.spark.mllib.tree.RandomForest;
 import org.apache.spark.mllib.tree.model.RandomForestModel;
@@ -18,11 +17,10 @@ import java.util.Map;
 /**
  * Created by abhijitdc on 1/5/19.
  *
- * Regression model to train separate model for temperature,humidity and pressure.
+ * RandomForest Regression model to train separate model for temperature,humidity and pressure.
  *
  * Independent variable ~ Dependent variables
  * ------------------------------------------------------------
- * Weather Condition ~  Latitude + Longitude + Elevation + Day of the year
  * Temperature ~  Latitude + Longitude + Elevation + Day of the year
  * Humidity ~  Latitude + Longitude + Elevation + Day of the year
  * Pressure ~  Latitude + Longitude + Elevation + Day of the year
@@ -38,7 +36,7 @@ public class RegressionModelTrainer {
         this.RUNID = RUNID;
     }
 
-    public void trainModel(String modelName, SensorType sensorType) {
+    public RandomForestModel trainModel(String modelName, SensorType sensorType) {
         SparkConf sparkConf = new SparkConf().setMaster("local[*]").setAppName("ToyWeatherRegressionModelTrainer");
         JavaSparkContext jsc = new JavaSparkContext(sparkConf);
         // Load and parse the data file.
@@ -48,7 +46,6 @@ public class RegressionModelTrainer {
         JavaRDD<LabeledPoint> allData = MLUtils.loadLibSVMFile(jsc.sc(), datapath).toJavaRDD();
         //filter data from the training file for a specific sensor
         JavaRDD<LabeledPoint> data = allData.filter(l -> l.features().toArray()[4] == Double.valueOf(sensorType.getSensorId()));
-        data.take(10).forEach(l -> System.out.println(l.features().toArray()[3]));
 
         // Split the data into training and test sets (30% held out for testing)
         JavaRDD<LabeledPoint>[] splits = data.randomSplit(new double[]{0.7, 0.3});
@@ -81,12 +78,15 @@ public class RegressionModelTrainer {
         // Save and load model
         model.save(jsc.sc(), "target/tmp/" + RUNID
                 + "/" + modelName);
-        RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
-                "target/tmp/"+ RUNID
-                        + "/"  + modelName);
-        double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, Double.valueOf(sensorType.getSensorId())));
-        System.out.println(sensorType + " <<<<<<<<<<<<<<<<<<<<<<< Predic >>>>>>>>>>>>>>>>>>>>>>>>> " + val);
+
+//        RandomForestModel sameModel = RandomForestModel.load(jsc.sc(),
+//                "target/tmp/"+ RUNID
+//                        + "/"  + modelName);
+//        double val = sameModel.predict(Vectors.dense(34.21, 12.31, 54.0, 65.0, Double.valueOf(sensorType.getSensorId())));
+//        System.out.println(sensorType + " <<<<<<<<<<<<<<<<<<<<<<< Predic >>>>>>>>>>>>>>>>>>>>>>>>> " + val);
+
         jsc.stop();
+        return model;
     }
 
 

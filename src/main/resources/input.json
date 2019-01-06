@@ -1,0 +1,8 @@
+{
+  "trainingLocationNum": 100,
+  "trainingNumOfDays": 365,
+  "trainingStartDate":"2010-03-02 11:22:10",
+  "reportingLocationNum": 10,
+  "reportingPerLocation": 100,
+  "reportingStartDate":"2016-03-02 11:22:10"
+}

@@ -45,24 +45,23 @@ public class GeoLocation {
     public MarkovProbVector getMarkovProbVector() {
         int zNo = 0, eNo = 0;
 
-        if (Math.abs(lati) / 30 >= 2)
+        if (Math.abs(lati) / 30 >= 2 && Math.abs(lati) <= 90.0)
             zNo = 3;
-        else if (Math.abs(lati) / 30 > 1)
+        else if (Math.abs(lati) / 30 >= 1 && Math.abs(lati) <= 90.0)
             zNo = 2;
-        else if (Math.abs(lati) / 30 <= 1)
+        else if (Math.abs(lati) / 30 < 1 && Math.abs(lati) <= 90.0)
             zNo = 1;
 
-        if (Math.abs(elv) / 77 >= 2)
+        if (Math.abs(elv) / 77 >= 2 && elv >= 0)
             eNo = 3;
-        else if (Math.abs(elv) / 77 > 1)
+        else if (Math.abs(elv) / 77 >= 1 && elv >= 0)
             eNo = 2;
-        else if (Math.abs(elv) / 77 <= 1)
+        else if (Math.abs(elv) / 77 < 1 && elv >= 0)
             eNo = 1;
 
         return MarkovProbVector.LOOKUP.get(zNo, eNo);
 
     }
-
 
     @Override
     public String toString() {
