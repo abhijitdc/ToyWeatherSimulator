@@ -131,7 +131,7 @@ Each run of the program will generate a RUNID from current system time and that 
     - temperature *(RUNID/TempRegressionModel)*
     - pressure *(RUNID/PressureRegressionModel)*
     - humidity *(RUNID/HumidityRegressionModel)*
-- weather condition *(RUNID/weatherConditionClassifierModel)*
+    - weather condition *(RUNID/weatherConditionClassifierModel)*
 - final output data for Run Mode 1 *(RUNID/sampledata.dat)*
 - final output data for Run Mode 2 *(RUNID/simulator.dat)*
 
