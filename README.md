@@ -128,10 +128,10 @@ Input json Format
 Each run of the program will generate a RUNID from current system time and that values will be used to create a directory as ``target/RUNID`` to keep outputs separated from each run. This directory will have
 - Training data *(RUNID/training.dat)*
 - All the generated models
- - temperature *(RUNID/TempRegressionModel)*
- - pressure *(RUNID/PressureRegressionModel)*
- - humidity *(RUNID/HumidityRegressionModel)*
- - weather condition *(RUNID/weatherConditionClassifierModel)*
+    - temperature *(RUNID/TempRegressionModel)*
+    - pressure *(RUNID/PressureRegressionModel)*
+    - humidity *(RUNID/HumidityRegressionModel)*
+- weather condition *(RUNID/weatherConditionClassifierModel)*
 - final output data for Run Mode 1 *(RUNID/sampledata.dat)*
 - final output data for Run Mode 2 *(RUNID/simulator.dat)*
 
