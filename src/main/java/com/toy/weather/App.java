@@ -23,6 +23,8 @@ public class App {
     public static void main(String[] args) throws FileNotFoundException {
 
         long RUNID = System.currentTimeMillis();
+        System.out.println("RUNID >>>>>>>>>> " + RUNID);
+
         String jsonInput = "src/main/resources/input.json";
 
 

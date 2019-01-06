@@ -100,6 +100,7 @@ public class TrainingDataGenerator {
         File fs = new File("target/tmp/" + RUNID);
         if (!fs.exists()) fs.mkdirs();
 
+
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(datapath, false))) {
             for (GeoLocation gcl : sampleLocations) {
                 //select a random starting weather condition for the geo location
@@ -123,7 +124,6 @@ public class TrainingDataGenerator {
                         bw.write(dataSample);
                         bw.newLine();
                     }
-
                     sampleDate = sampleDate.plusDays(1);
                 }
             }

@@ -61,16 +61,16 @@ public class SampleGenerator {
             int locationNo = 0;
             for (GeoLocation glc : sampleLocations) {
                 for (int i = 0; i < noOfSamplesPerLocation; i++) {
-                    LocalDateTime sampleDate = observationStartDate.plusDays(rd.nextInt(5 * 365));
+                    LocalDateTime sampleDate = observationStartDate.plusSeconds(rd.nextInt(2 * 24 * 60 * 60 * 365));
 
                     double weatheCondIndex = weatherCondModel.predict(Vectors.dense(glc.getLati(), glc.getLongi(), glc.getElv(), sampleDate.getDayOfYear(), 0.0));
                     double temperature = sensorModels.get(SensorType.TEMPSENSOR).predict(Vectors.dense(glc.getLati(), glc.getLongi(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.TEMPSENSOR.getSensorId()));
                     double humidity = sensorModels.get(SensorType.HUMIDSENSOR).predict(Vectors.dense(glc.getLati(), glc.getLongi(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.HUMIDSENSOR.getSensorId()));
                     double pressure = sensorModels.get(SensorType.PRESSURESENSOR).predict(Vectors.dense(glc.getLati(), glc.getLongi(), glc.getElv(), sampleDate.getDayOfYear(), SensorType.PRESSURESENSOR.getSensorId()));
 
-                    String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss", Locale.US));
+                    String strSampleDate = sampleDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
                     WeatherCondition wc = WeatherCondition.LOOKUP.get((int) Math.round(weatheCondIndex));
-                    String sampleData = String.format("%d|%.3f,%.3f,%d|%s|%s|%.2f|%.2f|%d", locationNo, glc.getLati(), glc.getLongi(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, humidity, (int) Math.round(pressure));
+                    String sampleData = String.format("%s|%.3f,%.3f,%d|%s|%s|%.2f|%.2f|%d", "LOCATION-" + locationNo, glc.getLati(), glc.getLongi(), glc.getElv(), strSampleDate, wc.getCondName(), temperature, pressure, (int) Math.round(humidity));
 //                    System.out.println(sampleData);
                     bw.write(sampleData);
                     bw.newLine();
