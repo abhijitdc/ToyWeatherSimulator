@@ -43,9 +43,12 @@ Following are the nine set of vectors, out of which one will be chosen based on 
 
 >Yah! earth has no tilt on it's axis :)
 
-Multiple Geo locations will be chosen at random from the bitmap ``elevation_DE.BMP`` for generating the training data.
+Multiple Geo locations will be chosen at random from the bitmap ``elevation_DE.BMP`` for generating the training data. This bitmap has real earth elevation data in the Red channel.
 
->elevation_DE.BMP has a pixel height and width of 540 x 1080 and the RED color channel has the elevation data. Based on the size of the image we can assume that it has one elevation observation every 20 minutes of latitude or longitude change. The top left corner has the (x,y) coordinate as (0,0), so accordingly the pixel coordinate will be used to translate into real latitude and longitude.
+###### elevation_DE.BMP
+ - Bitmap elevation_DE.BMP has a pixel height and width of 540 x 1080 and the RED color channel has the elevation data. Based on the size of the image we can assume that it has one elevation observation every 20 minutes of latitude or longitude change.
+ - The top left corner has the (x,y) coordinate as (0,0), so accordingly the pixel coordinate will be used to translate into real world latitude and longitude.
+ - The file is included in src/main/resources
 
 ## Predictive Modeling
 
@@ -120,4 +123,3 @@ Each run of the program will generate a RUNID from current system time and that 
 
 - https://www.dartmouth.edu/~chance/teaching_aids/books_articles/probability_book/Chapter11.pdf
 - Other github users work on similar topic.
-
