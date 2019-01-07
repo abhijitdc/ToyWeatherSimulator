@@ -45,7 +45,7 @@ Following are the nine set of 3X3 *(sunny,rain,snow)* matrix, out of which one w
 
 Multiple Geo locations will be chosen at random from the bitmap ``elevation_DE.BMP`` for generating the training data. This bitmap has real earth elevation data in the Red channel.
 
-###### elevation_DE.BMP
+##### Topography Data Source - elevation_DE.BMP
  - Bitmap elevation_DE.BMP has a pixel height and width of 540 x 1080 and the RED color channel has the elevation data. Based on the size of the image we can assume that it has one elevation observation every 20 minutes of latitude or longitude change.
  - The top left corner has the (x,y) coordinate as (0,0), so accordingly the pixel coordinate will be used to translate into real world latitude and longitude.
  - The file is included in src/main/resources
