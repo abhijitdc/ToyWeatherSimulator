@@ -51,7 +51,8 @@ Multiple Geo locations will be chosen at random from the bitmap ``elevation_DE.B
  - The file is included in src/main/resources
 
 ## Predictive Modeling
-###### Note: optional if only need to generate weather data for simulation, see details in "How to run it"
+
+**Note: This step is optional if only need to generate weather data for simulation (and not predict),  see details in "How to run it"**
 
 We will train both Regression and Classification model for generating weather data based on latitude, longitude, elevation and time.
 
