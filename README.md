@@ -20,7 +20,7 @@ Create a toy simulation of the environment (taking into account things like atmo
        - Random Forests (Classification and Regression)
        - LIBSVM data format for training data
 
-## Training Data Generation
+## Training Data Generation - (Dummy Weather Data Generation)
 
 To generate the training data we are using a stochastic model ``(Markov Process)`` to first simulate weather condition change and then based on the weather condition we will generate other sensor measurements (temperature, pressure and humidity) from a plausible range.
 
